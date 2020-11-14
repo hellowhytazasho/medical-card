@@ -1,0 +1,12 @@
+{
+  "mongodb": {
+    "connection": {
+      "host": "localhost",
+      "port": "27017",
+      "db": "my-city"
+    }
+  },
+  "logger": {
+    "level": "info"
+  }
+}
