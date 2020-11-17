@@ -2,8 +2,10 @@ const { History } = require('../models/history.model');
 
 async function getUserHistory({ offset, limit }, { userId }) {
   const data = await History.find({ userId })
-    .skip(offset || 0)
-    .limit(limit || Number.POSITIVE_INFINITY);
+    // eslint-disable-next-line radix
+    .skip(parseInt(offset) || 0)
+    // eslint-disable-next-line radix
+    .limit(parseInt(limit) || Number.MAX_SAFE_INTEGER);
   return data;
 }
 
