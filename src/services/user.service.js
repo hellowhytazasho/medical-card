@@ -32,12 +32,6 @@ async function getUserData({ uuid, type }, userId) {
   const userEvents = await Event.find({ userId }).lean().exec();
   const userHistory = await History.find({ userId }).lean().exec();
 
-  const data = {
-    events: userEvents,
-    history: userHistory,
-    user: user[0],
-  };
-
   if (user.length === 0) {
     const {
       userName, photo, sex, birthday,
@@ -45,12 +39,12 @@ async function getUserData({ uuid, type }, userId) {
 
     User.create({
       // eslint-disable-next-line max-len
-      userId, userName, photo, lastUpdate: new Date(), sex, birthday, allowView: 0,
+      userId, userName, photo, lastUpdate: new Date(), sex, birthday, allowView: 0, bloodType: null,
     });
 
     const sendData = new User({
       // eslint-disable-next-line max-len
-      userId, userName, photo, lastUpdate: new Date(), sex, birthday, allowView: 0,
+      userId, userName, photo, lastUpdate: new Date(), sex, birthday, allowView: 0, bloodType: null,
     });
     return sendData;
   }
@@ -64,6 +58,14 @@ async function getUserData({ uuid, type }, userId) {
       },
     });
   }
+
+  user[0].events = userEvents;
+  user[0].history = userHistory;
+
+  const data = {
+    user: user[0],
+  };
+
   return data;
 }
 
