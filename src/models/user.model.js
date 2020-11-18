@@ -41,7 +41,7 @@ const SchemaDefinition = {
     }],
   },
   birthday: {
-    type: String,
+    type: Date,
   },
   sex: {
     type: Number,
