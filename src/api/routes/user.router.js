@@ -19,7 +19,7 @@ router.get('/get', async (req, res, next) => {
   try {
     const { userId } = req.context;
     const data = await getUserData(req.query, userId);
-    res.send({ data });
+    res.send(data);
   } catch (error) {
     next(error);
   }
