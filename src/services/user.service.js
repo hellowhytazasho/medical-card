@@ -21,7 +21,7 @@ async function getUserData({ uuid, type }, userId) {
       });
     // eslint-disable-next-line no-underscore-dangle
     } else if (String(client[0]._id) === uuid) {
-      createHistory(user[0], client[0].id, type);
+      createHistory(user[0], client[0].userId, type);
       return client[0];
     }
     throw new HttpError({
@@ -46,7 +46,7 @@ async function getUserData({ uuid, type }, userId) {
       // eslint-disable-next-line max-len
       userId, userName, photo, lastUpdate: new Date(), sex, birthday, allowView: 0, bloodType: null,
     });
-    return sendData;
+    return { user: sendData };
   }
   if (((user[0].lastUpdate.getTime() + ONE_DAYS) - Date.now()) < 0) {
     const { userName, photo } = await getVKUserData(userId);
