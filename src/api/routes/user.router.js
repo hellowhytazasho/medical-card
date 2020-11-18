@@ -8,6 +8,9 @@ const {
   addAllergen,
   deleteDisease,
   deleteAllergen,
+  changeAllowView,
+  editAllergen,
+  editDisease,
 } = require('../../services/user.service');
 
 const router = Router();
@@ -25,8 +28,18 @@ router.get('/get', async (req, res, next) => {
 router.get('/addDisease', async (req, res, next) => {
   try {
     const { userId } = req.context;
-    const data = await addDisease(req.query, userId);
-    res.send({ data });
+    await addDisease(req.query, userId);
+    res.send({ status: '200' });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/editDisease', async (req, res, next) => {
+  try {
+    const { userId } = req.context;
+    await editDisease(req.query, userId);
+    res.send({ status: '200' });
   } catch (error) {
     next(error);
   }
@@ -35,8 +48,8 @@ router.get('/addDisease', async (req, res, next) => {
 router.get('/deleteDisease', async (req, res, next) => {
   try {
     const { userId } = req.context;
-    const data = await deleteDisease(req.query, userId);
-    res.send({ data });
+    await deleteDisease(req.query, userId);
+    res.send({ status: '200' });
   } catch (error) {
     next(error);
   }
@@ -45,8 +58,18 @@ router.get('/deleteDisease', async (req, res, next) => {
 router.get('/addAllergen', async (req, res, next) => {
   try {
     const { userId } = req.context;
-    const data = await addAllergen(req.query, userId);
-    res.send({ data });
+    await addAllergen(req.query, userId);
+    res.send({ status: '200' });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/editAllergen', async (req, res, next) => {
+  try {
+    const { userId } = req.context;
+    await editAllergen(req.query, userId);
+    res.send({ status: '200' });
   } catch (error) {
     next(error);
   }
@@ -55,8 +78,8 @@ router.get('/addAllergen', async (req, res, next) => {
 router.get('/deleteAllergen', async (req, res, next) => {
   try {
     const { userId } = req.context;
-    const data = await deleteAllergen(req.query, userId);
-    res.send({ data });
+    await deleteAllergen(req.query, userId);
+    res.send({ status: '200' });
   } catch (error) {
     next(error);
   }
@@ -65,8 +88,8 @@ router.get('/deleteAllergen', async (req, res, next) => {
 router.get('/changeBirthday', async (req, res, next) => {
   try {
     const { userId } = req.context;
-    const data = await changeUserBirthday(req.query, userId);
-    res.send({ data });
+    await changeUserBirthday(req.query, userId);
+    res.send({ status: '200' });
   } catch (error) {
     next(error);
   }
@@ -75,8 +98,8 @@ router.get('/changeBirthday', async (req, res, next) => {
 router.get('/changeGender', async (req, res, next) => {
   try {
     const { userId } = req.context;
-    const data = await changeGender(req.query, userId);
-    res.send({ data });
+    await changeGender(req.query, userId);
+    res.send({ status: '200' });
   } catch (error) {
     next(error);
   }
@@ -85,8 +108,18 @@ router.get('/changeGender', async (req, res, next) => {
 router.get('/changeBloodType', async (req, res, next) => {
   try {
     const { userId } = req.context;
-    const data = await changeBloodType(req.query, userId);
-    res.send({ data });
+    await changeBloodType(req.query, userId);
+    res.send({ status: '200' });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/changeAllowView', async (req, res, next) => {
+  try {
+    const { userId } = req.context;
+    await changeAllowView(req.query, userId);
+    res.send({ status: '200' });
   } catch (error) {
     next(error);
   }
