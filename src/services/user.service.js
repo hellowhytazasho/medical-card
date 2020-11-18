@@ -9,11 +9,10 @@ const { createHistory } = require('./history.service');
 
 const ONE_DAY = 1;
 
-// eslint-disable-next-line no-unused-vars
 async function getUserData({ uuid, type }, userId) {
   const user = await User.findOne({ userId }).lean().exec();
 
-  if (uuid) {
+  if (uuid && !user._id.equals(uuid)) {
     const client = await User.findOne({ _id: uuid }).lean().exec();
     if (!client) {
       throw new HttpError({
@@ -22,7 +21,6 @@ async function getUserData({ uuid, type }, userId) {
       });
     }
 
-    // eslint-disable-next-line no-underscore-dangle
     if (client._id.equals(uuid)) {
       await createHistory(user, client.userId, type);
       return client;
