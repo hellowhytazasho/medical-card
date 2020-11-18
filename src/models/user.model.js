@@ -26,13 +26,18 @@ const SchemaDefinition = {
   diseases: {
     type: [{
       _id: false,
-      disease: String,
+      title: String,
+      dateStart: Date,
+      dateEnd: Date,
+      color: Number,
     }],
   },
   allergens: {
     type: [{
       _id: false,
-      allergen: String,
+      title: String,
+      date: Date,
+      color: Number,
     }],
   },
   birthday: {
