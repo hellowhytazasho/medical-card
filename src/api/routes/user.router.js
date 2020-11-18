@@ -13,13 +13,20 @@ const {
   editDisease,
 } = require('../../services/user.service');
 
+const DateHelper = require('../../helpers/date.helper');
+
 const router = Router();
+
+const DATES_TO_CONVERT = ['birthday', 'createdAt', 'updatedAt'];
 
 router.get('/get', async (req, res, next) => {
   try {
     const { userId } = req.context;
-    const data = await getUserData(req.query, userId);
-    res.send(data);
+    const user = await getUserData(req.query, userId);
+    res.send({
+      ...user,
+      ...DateHelper.convertToTimestamp(user, DATES_TO_CONVERT),
+    });
   } catch (error) {
     next(error);
   }

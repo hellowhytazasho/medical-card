@@ -14,32 +14,23 @@ const SchemaDefinition = {
   photo: {
     type: String,
   },
-  lastUpdate: {
-    type: Date,
-  },
   allowView: {
     type: Number,
   },
   bloodType: {
     type: Number,
   },
-  diseases: {
-    type: [{
-      _id: false,
-      title: String,
-      dateStart: Date,
-      dateEnd: Date,
-      color: Number,
-    }],
-  },
-  allergens: {
-    type: [{
-      _id: false,
-      title: String,
-      date: Date,
-      color: Number,
-    }],
-  },
+  diseases: [{
+    title: String,
+    dateStart: Date,
+    dateEnd: Date,
+    color: Number,
+  }],
+  allergens: [{
+    title: String,
+    date: Date,
+    color: Number,
+  }],
   birthday: {
     type: Date,
   },
@@ -52,6 +43,11 @@ const UserSchema = new Schema(SchemaDefinition, {
   timestamps: { createdAt: 'createdAt' },
   versionKey: false,
 });
+
+// UserSchema.pre(/update|save/i, (next) => {
+//   this.updatedAt = Date.now();
+//   return next();
+// });
 
 UserSchema.index({ vk_user_id: 1 });
 

@@ -1,4 +1,5 @@
-/* eslint-disable radix */
+const { differenceInDays } = require('date-fns');
+
 const { User } = require('../models/user.model');
 const { Event } = require('../models/event.model');
 const { History } = require('../models/history.model');
@@ -6,242 +7,178 @@ const getVKUserData = require('../helpers/get-user-info');
 const { HttpError } = require('../errors');
 const { createHistory } = require('./history.service');
 
-const ONE_DAYS = 86400000;
+const ONE_DAY = 1;
 
 // eslint-disable-next-line no-unused-vars
 async function getUserData({ uuid, type }, userId) {
-  const user = await User.find({ userId }).lean().exec();
+  const user = await User.findOne({ userId }).lean().exec();
 
   if (uuid) {
-    const client = await User.find({ _id: uuid }).lean().exec();
-    if (client.length === 0) {
+    const client = await User.findOne({ _id: uuid }).lean().exec();
+    if (!client) {
       throw new HttpError({
         message: 'Client not found',
         code: 404,
       });
-    // eslint-disable-next-line no-underscore-dangle
-    } else if (String(client[0]._id) === uuid) {
-      createHistory(user[0], client[0].userId, type);
-      return client[0];
     }
+
+    // eslint-disable-next-line no-underscore-dangle
+    if (client._id.equals(uuid)) {
+      await createHistory(user, client.userId, type);
+      return client;
+    }
+
     throw new HttpError({
       message: 'Wrong uuid',
       code: 401,
     });
   }
-  const userEvents = await Event.find({ userId }).lean().exec();
-  const userHistory = await History.find({ userId }).lean().exec();
 
-  if (user.length === 0) {
+  const [
+    userEvents,
+    userHistory,
+  ] = await Promise.all([
+    Event.find({ userId }).lean().exec(),
+    History.find({ userId }).lean().exec(),
+  ]);
+
+  if (!user) {
     const {
       userName, photo, sex, birthday,
     } = await getVKUserData(userId);
 
-    User.create({
-      // eslint-disable-next-line max-len
-      userId, userName, photo, lastUpdate: new Date(), sex, birthday, allowView: 0, bloodType: null,
+    const newUser = new User({
+      userId,
+      userName,
+      photo,
+      sex,
+      birthday,
+      allowView: 0,
+      bloodType: null,
     });
 
-    const sendData = new User({
-      // eslint-disable-next-line max-len
-      userId, userName, photo, lastUpdate: new Date(), sex, birthday, allowView: 0, bloodType: null,
-    });
-    return { user: sendData };
+    await newUser.save();
+
+    return newUser;
   }
-  if (((user[0].lastUpdate.getTime() + ONE_DAYS) - Date.now()) < 0) {
+
+  const diff = differenceInDays(new Date(), user.updatedAt);
+
+  if (diff > ONE_DAY) {
     const { userName, photo } = await getVKUserData(userId);
 
-    User.updateOne({ userId }, {
-      $set: {
-        userName,
-        photo,
-      },
+    await User.updateOne({ userId }, {
+      $set: { userName, photo },
     });
   }
 
-  user[0].events = userEvents;
-  user[0].history = userHistory;
+  user.events = userEvents;
+  user.history = userHistory;
 
-  const data = {
-    user: user[0],
-  };
-
-  return data;
+  return user;
 }
 
 async function addDisease({
   title, dateStart, dateEnd, color,
 }, userId) {
-  try {
-    const start = dateStart ? new Date(parseInt(dateStart)) : null;
-    const end = dateEnd ? new Date(parseInt(dateEnd)) : null;
+  const start = dateStart ? new Date(Number(dateStart)) : null;
+  const end = dateEnd ? new Date(Number(dateEnd)) : null;
 
-    await User.updateOne({ userId }, {
-      $push: {
-        diseases: {
-          title, dateStart: start, dateEnd: end, color,
-        },
+  return User.updateOne({ userId }, {
+    $push: {
+      diseases: {
+        title, dateStart: start, dateEnd: end, color,
       },
-    });
-  } catch (error) {
-    throw new HttpError({
-      message: error,
-      code: 500,
-    });
-  }
+    },
+  });
 }
 
 async function editDisease({
   title, newTitle, dateStart, dateEnd, color,
 }, userId) {
-  try {
-    const start = dateStart ? new Date(parseInt(dateStart)) : null;
-    const nTitle = newTitle || title;
+  const start = dateStart ? new Date(Number(dateStart)) : null;
+  const nTitle = newTitle || title;
 
-    await User.updateOne({ userId, 'diseases.title': title }, {
-      $set: {
-        'diseases.$.title': nTitle,
-        'diseases.$.dateStart': start,
-        'diseases.$.dateEnd': dateEnd,
-        'diseases.$.color': color,
-      },
-    });
-  } catch (error) {
-    throw new HttpError({
-      message: error,
-      code: 500,
-    });
-  }
+  return User.updateOne({ userId, 'diseases.title': title }, {
+    $set: {
+      'diseases.$.title': nTitle,
+      'diseases.$.dateStart': start,
+      'diseases.$.dateEnd': dateEnd,
+      'diseases.$.color': color,
+    },
+  });
 }
 
 async function deleteDisease({ title }, userId) {
-  try {
-    await User.updateOne({ userId }, {
-      $pull: {
-        diseases: { title },
-      },
-    });
-  } catch (error) {
-    throw new HttpError({
-      message: error,
-      code: 500,
-    });
-  }
+  return User.updateOne({ userId }, {
+    $pull: {
+      diseases: { title },
+    },
+  });
 }
 
 async function addAllergen({ title, dateStart, color }, userId) {
-  try {
-    const date = dateStart ? new Date(parseInt(dateStart)) : null;
-    await User.updateOne({ userId }, {
-      $push: {
-        allergens: { title, date, color },
-      },
-    });
-  } catch (error) {
-    throw new HttpError({
-      message: error,
-      code: 500,
-    });
-  }
+  const date = dateStart ? new Date(Number(dateStart)) : null;
+  return User.updateOne({ userId }, {
+    $push: {
+      allergens: { title, date, color },
+    },
+  });
 }
 
 async function editAllergen({
   title, newTitle, dateStart, color,
 }, userId) {
-  try {
-    const date = dateStart ? new Date(parseInt(dateStart)) : null;
-    const nTitle = newTitle || title;
+  const date = dateStart ? new Date(Number(dateStart)) : null;
+  const nTitle = newTitle || title;
 
-    await User.updateOne({ userId, 'allergens.title': title }, {
-      $set: {
-        'allergens.$.title': nTitle,
-        'allergens.$.date': date,
-        'allergens.$.color': color,
-      },
-    });
-  } catch (error) {
-    throw new HttpError({
-      message: error,
-      code: 500,
-    });
-  }
+  return User.updateOne({ userId, 'allergens.title': title }, {
+    $set: {
+      'allergens.$.title': nTitle,
+      'allergens.$.date': date,
+      'allergens.$.color': color,
+    },
+  });
 }
 
 async function deleteAllergen({ title }, userId) {
-  try {
-    await User.updateOne({ userId }, {
-      $pull: {
-        allergens: { title },
-      },
-    });
-  } catch (error) {
-    throw new HttpError({
-      message: error,
-      code: 500,
-    });
-  }
+  return User.updateOne({ userId }, {
+    $pull: {
+      allergens: { title },
+    },
+  });
 }
 
 async function changeUserBirthday({ birthday }, userId) {
-  try {
-    await User.updateOne({ userId }, {
-      $set: {
-        birthday,
-      },
-    });
-  } catch (error) {
-    throw new HttpError({
-      message: error,
-      code: 500,
-    });
-  }
+  return User.updateOne({ userId }, {
+    $set: {
+      birthday,
+    },
+  });
 }
 
 async function changeGender({ sex }, userId) {
-  try {
-    await User.updateOne({ userId }, {
-      $set: {
-        sex,
-      },
-    });
-  } catch (error) {
-    throw new HttpError({
-      message: error,
-      code: 500,
-    });
-  }
+  return User.updateOne({ userId }, {
+    $set: {
+      sex,
+    },
+  });
 }
 
-// eslint-disable-next-line camelcase
 async function changeBloodType({ bloodType }, userId) {
-  try {
-    await User.updateOne({ userId }, {
-      $set: {
-        bloodType,
-      },
-    });
-  } catch (error) {
-    throw new HttpError({
-      message: error,
-      code: 500,
-    });
-  }
+  return User.updateOne({ userId }, {
+    $set: {
+      bloodType,
+    },
+  });
 }
 
-// eslint-disable-next-line camelcase
 async function changeAllowView({ allowView }, userId) {
-  try {
-    await User.updateOne({ userId }, {
-      $set: {
-        allowView,
-      },
-    });
-  } catch (error) {
-    throw new HttpError({
-      message: error,
-      code: 500,
-    });
-  }
+  return User.updateOne({ userId }, {
+    $set: {
+      allowView,
+    },
+  });
 }
 
 module.exports = {

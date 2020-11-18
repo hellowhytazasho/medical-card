@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js | ./node_modules/.bin/bunyan",
+    "debug": "nodemon --inspect index.js | ./node_modules/.bin/bunyan",
     "lint": "eslint . --color --format stylish --fix"
   },
   "keywords": [],

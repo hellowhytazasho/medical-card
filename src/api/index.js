@@ -45,8 +45,8 @@ app.use('/history', historyRouter);
 
 // eslint-disable-next-line no-unused-vars
 app.use((error, req, res, next) => {
-  if (error.status) {
-    res.status(error.status);
+  if (error.code) {
+    res.status(error.code);
   }
 
   res.send({
