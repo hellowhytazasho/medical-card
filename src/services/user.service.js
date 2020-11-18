@@ -117,24 +117,24 @@ async function deleteDisease({ diseaseId }, userId) {
   });
 }
 
-async function addAllergen({ title, dateStart, color }, userId) {
-  const date = dateStart ? new Date(Number(dateStart)) : null;
+async function addAllergen({ title, date, color }, userId) {
+  const convertedDate = date ? new Date(Number(date)) : null;
   return User.updateOne({ userId }, {
     $push: {
-      allergens: { title, date, color },
+      allergens: { title, date: convertedDate, color },
     },
   });
 }
 
 async function editAllergen({
-  allergenId, title, dateStart, color,
+  allergenId, title, date, color,
 }, userId) {
-  const date = dateStart ? new Date(Number(dateStart)) : null;
+  const newDate = date ? new Date(Number(date)) : null;
 
   return User.updateOne({ userId, 'allergens._id': allergenId }, {
     $set: {
       'allergens.$.title': title,
-      'allergens.$.date': date,
+      'allergens.$.date': newDate,
       'allergens.$.color': color,
     },
   });

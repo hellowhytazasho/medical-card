@@ -17,7 +17,8 @@ const DateHelper = require('../../helpers/date.helper');
 
 const router = Router();
 
-const DATES_TO_CONVERT = ['birthday', 'createdAt', 'updatedAt'];
+const TIMESTAMPS = ['dateStart', 'dateEnd'];
+const DATES_TO_CONVERT = [...TIMESTAMPS, 'birthday'];
 
 router.get('/get', async (req, res, next) => {
   try {
@@ -27,9 +28,13 @@ router.get('/get', async (req, res, next) => {
       ...user,
       ...DateHelper.convertToTimestamp(user, DATES_TO_CONVERT),
       diseases: user.diseases
-        .map((d) => ({ ...d, ...DateHelper.convertToTimestamp(d, ['dateStart', 'dateEnd']) })),
+        .map((d) => ({ ...d, ...DateHelper.convertToTimestamp(d, TIMESTAMPS) })),
       allergens: user.allergens
         .map((a) => ({ ...a, ...DateHelper.convertToTimestamp(a, ['date']) })),
+      history: user.history
+        .map((h) => ({ ...h, ...DateHelper.convertToTimestamp(a, TIMESTAMPS) })),
+      events: user.events
+        .map((e) => ({ ...e, ...DateHelper.convertToTimestamp(a, TIMESTAMPS) })),
     });
   } catch (error) {
     next(error);
