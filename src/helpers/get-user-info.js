@@ -18,7 +18,7 @@ async function getVKUserData(userId) {
 
     if (bday.length < BAD_LENGTH) {
       // eslint-disable-next-line no-unused-expressions
-      birthday == null;
+      birthday = null;
     } else {
       birthday = parse(bday, 'd.MM.yyyy', Date.now()).toString();
     }
