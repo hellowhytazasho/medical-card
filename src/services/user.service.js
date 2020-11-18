@@ -94,25 +94,25 @@ async function addDisease({
 }
 
 async function editDisease({
-  title, newTitle, dateStart, dateEnd, color,
+  diseaseId, title, dateStart, dateEnd, color,
 }, userId) {
   const start = dateStart ? new Date(Number(dateStart)) : null;
-  const nTitle = newTitle || title;
+  const end = dateEnd ? new Date(Number(dateEnd)) : null;
 
-  return User.updateOne({ userId, 'diseases.title': title }, {
+  return User.updateOne({ userId, 'diseases._id': diseaseId }, {
     $set: {
-      'diseases.$.title': nTitle,
+      'diseases.$.title': title,
       'diseases.$.dateStart': start,
-      'diseases.$.dateEnd': dateEnd,
+      'diseases.$.dateEnd': end,
       'diseases.$.color': color,
     },
   });
 }
 
-async function deleteDisease({ title }, userId) {
+async function deleteDisease({ diseaseId }, userId) {
   return User.updateOne({ userId }, {
     $pull: {
-      diseases: { title },
+      diseases: { _id: diseaseId },
     },
   });
 }
@@ -127,24 +127,23 @@ async function addAllergen({ title, dateStart, color }, userId) {
 }
 
 async function editAllergen({
-  title, newTitle, dateStart, color,
+  allergenId, title, dateStart, color,
 }, userId) {
   const date = dateStart ? new Date(Number(dateStart)) : null;
-  const nTitle = newTitle || title;
 
-  return User.updateOne({ userId, 'allergens.title': title }, {
+  return User.updateOne({ userId, 'allergens._id': allergenId }, {
     $set: {
-      'allergens.$.title': nTitle,
+      'allergens.$.title': title,
       'allergens.$.date': date,
       'allergens.$.color': color,
     },
   });
 }
 
-async function deleteAllergen({ title }, userId) {
+async function deleteAllergen({ allergenId }, userId) {
   return User.updateOne({ userId }, {
     $pull: {
-      allergens: { title },
+      allergens: { _id: allergenId },
     },
   });
 }

@@ -26,6 +26,10 @@ router.get('/get', async (req, res, next) => {
     res.send({
       ...user,
       ...DateHelper.convertToTimestamp(user, DATES_TO_CONVERT),
+      diseases: user.diseases
+        .map((d) => ({ ...d, ...DateHelper.convertToTimestamp(d, ['dateStart', 'dateEnd']) })),
+      allergens: user.allergens
+        .map((a) => ({ ...a, ...DateHelper.convertToTimestamp(a, ['date']) })),
     });
   } catch (error) {
     next(error);
