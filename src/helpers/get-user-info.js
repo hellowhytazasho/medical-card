@@ -16,7 +16,7 @@ async function getVKUserData(userId) {
     const bday = respData.response[0].bdate;
     let birthday;
 
-    if (bday.length < BAD_LENGTH) {
+    if (bday.length <= BAD_LENGTH) {
       // eslint-disable-next-line no-unused-expressions
       birthday = null;
     } else {
