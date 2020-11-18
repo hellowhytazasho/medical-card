@@ -57,7 +57,11 @@ async function getUserData({ uuid, type }, userId) {
 
     await newUser.save();
 
-    return newUser;
+    return {
+      ...newUser.toObject(),
+      events: [],
+      history: [],
+    };
   }
 
   const diff = differenceInDays(new Date(), user.updatedAt);
