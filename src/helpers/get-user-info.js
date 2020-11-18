@@ -1,9 +1,11 @@
 const config = require('config');
 const axios = require('axios');
+const { parse } = require('date-fns');
 
 const { HttpError } = require('../errors');
 
 const { vkApp: { token: VK_APP_TOKEN } } = config;
+const BAD_LENGTH = 4;
 
 async function getVKUserData(userId) {
   try {
@@ -11,11 +13,21 @@ async function getVKUserData(userId) {
     const resp = await axios.get(url);
     const respData = resp.data;
 
+    const bday = respData.response[0].bdate;
+    let birthday;
+
+    if (bday.length < BAD_LENGTH) {
+      // eslint-disable-next-line no-unused-expressions
+      birthday == null;
+    } else {
+      birthday = parse(bday, 'd.MM.yyyy', Date.now()).toString();
+    }
+
     const userData = {
       userName: `${respData.response[0].first_name} ${respData.response[0].last_name}`,
       photo: respData.response[0].photo_200_orig,
       sex: respData.response[0].sex,
-      birthday: respData.response[0].bdate,
+      birthday,
     };
     return userData;
   } catch (error) {
