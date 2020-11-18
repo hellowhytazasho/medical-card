@@ -8,7 +8,26 @@ async function addNewEvent({
     await Event.create({
       userId, title, description, date, color,
     });
-    return '200';
+  } catch (error) {
+    throw new HttpError({
+      message: error,
+      code: 500,
+    });
+  }
+}
+
+async function editEvent({
+  title, id, description, date, color,
+}) {
+  try {
+    await Event.updateOne({ _id: id, title }, {
+      $set: {
+        title,
+        description,
+        date,
+        color,
+      },
+    });
   } catch (error) {
     throw new HttpError({
       message: error,
@@ -31,4 +50,5 @@ async function deleteEvent({ id }) {
 module.exports = {
   addNewEvent,
   deleteEvent,
+  editEvent,
 };
