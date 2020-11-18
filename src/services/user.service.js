@@ -53,8 +53,6 @@ async function getUserData({ uuid, type }, userId) {
       photo,
       sex,
       birthday,
-      allowView: 0,
-      bloodType: null,
     });
 
     await newUser.save();

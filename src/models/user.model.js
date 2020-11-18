@@ -16,9 +16,11 @@ const SchemaDefinition = {
   },
   allowView: {
     type: Number,
+    default: 0,
   },
   bloodType: {
     type: Number,
+    default: 8,
   },
   diseases: [{
     title: String,
