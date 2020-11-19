@@ -7,7 +7,7 @@ const SchemaDefinition = {
     type: Number,
   },
   guestId: {
-    type: String,
+    type: Number,
   },
   guestName: {
     type: String,
