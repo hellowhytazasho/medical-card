@@ -8,7 +8,7 @@ const SchemaDefinition = {
     require: true,
   },
   userId: {
-    type: String,
+    type: Number,
     require: true,
   },
   photo: {
