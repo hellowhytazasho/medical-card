@@ -14,7 +14,6 @@ async function getUserData({ uuid, type }, userId) {
 
   if (uuid && !user._id.equals(uuid)) {
     const client = await User.findOne({ _id: uuid }).lean().exec();
-    console.log(client);
     if (!client) {
       throw new HttpError({
         message: 'Client not found',
@@ -23,13 +22,14 @@ async function getUserData({ uuid, type }, userId) {
     }
 
     if (client._id.equals(uuid)) {
+      const clientEvents = await Event.find({ userId: client.userId }).lean().exec();
+      client.events = clientEvents;
+
       await createHistory(user, client.userId, type);
       return {
         ...client,
-        events: [],
         history: [],
       };
-      return client;
     }
 
     throw new HttpError({
