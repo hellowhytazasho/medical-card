@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 
 const SchemaDefinition = {
   userId: {
-    type: String,
+    type: Number,
   },
   title: {
     type: String,
@@ -16,7 +16,7 @@ const SchemaDefinition = {
     type: Number,
   },
   date: {
-    type: String,
+    type: Date,
   },
 };
 

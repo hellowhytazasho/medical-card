@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 
 const SchemaDefinition = {
   userId: {
-    type: String,
+    type: Number,
   },
   guestId: {
     type: String,
