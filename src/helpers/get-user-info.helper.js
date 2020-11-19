@@ -14,14 +14,20 @@ async function getVKUserData(userId) {
     const respData = resp.data;
 
     const bday = respData.response[0].bdate;
+    console.log(bday);
     let birthday;
 
-    if (bday.length <= BAD_LENGTH) {
-      // eslint-disable-next-line no-unused-expressions
-      birthday = null;
+    if (bday) {
+      if (bday.length <= BAD_LENGTH) {
+        // eslint-disable-next-line no-unused-expressions
+        birthday = null;
+      } else {
+        birthday = parse(bday, 'd.MM.yyyy', Date.now()).toString();
+      }
     } else {
-      birthday = parse(bday, 'd.MM.yyyy', Date.now()).toString();
+      birthday = null;
     }
+
 
     const userData = {
       userName: `${respData.response[0].first_name} ${respData.response[0].last_name}`,

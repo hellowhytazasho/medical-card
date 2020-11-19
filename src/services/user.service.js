@@ -3,7 +3,7 @@ const { differenceInDays } = require('date-fns');
 const { User } = require('../models/user.model');
 const { Event } = require('../models/event.model');
 const { History } = require('../models/history.model');
-const getVKUserData = require('../helpers/get-user-info');
+const getVKUserData = require('../helpers/get-user-info.helper');
 const { HttpError } = require('../errors');
 const { createHistory } = require('./history.service');
 
