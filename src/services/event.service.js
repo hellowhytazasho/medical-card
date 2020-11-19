@@ -20,7 +20,7 @@ async function editEvent({
   title, id, description, date, color,
 }) {
   try {
-    await Event.updateOne({ _id: id, title }, {
+    await Event.updateOne({ _id: id }, {
       $set: {
         title,
         description,
