@@ -21,7 +21,7 @@ async function getUserData({ uuid, type }, userId) {
       });
     }
 
-    if (client._id.equals(uuid)) {
+    if (client._id.equals(uuid) && client.allowView == type) {
       const clientEvents = await Event.find({ userId: client.userId }).lean().exec();
       client.events = clientEvents;
 
@@ -33,7 +33,7 @@ async function getUserData({ uuid, type }, userId) {
     }
 
     throw new HttpError({
-      message: 'Wrong uuid',
+      message: 'Wrong uuid or wrong type',
       code: 401,
     });
   }

@@ -14,7 +14,6 @@ async function getVKUserData(userId) {
     const respData = resp.data;
 
     const bday = respData.response[0].bdate;
-    console.log(bday);
     let birthday;
 
     if (bday) {
