@@ -13,7 +13,7 @@ async function addNewEvent({
   const userEvents = await Event.find({ userId,
     createdAt: {
       $gt: new Date(Date.now() - FLOOD_TIME)
-    }});
+  }});
 
   if (userEvents.length > ELEM_COUNT) {
     throw new HttpError({

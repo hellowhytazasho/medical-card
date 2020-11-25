@@ -1,5 +1,6 @@
-const { differenceInDays } = require('date-fns');
+const config = require('config');
 
+const { differenceInDays } = require('date-fns');
 const { User } = require('../models/user.model');
 const { Event } = require('../models/event.model');
 const { History } = require('../models/history.model');
@@ -116,15 +117,30 @@ async function getUserData({ uuid, uuidv4 }, userId) {
 async function addDisease({
   title, dateStart, dateEnd, color,
 }, userId) {
-  const start = dateStart ? new Date(Number(dateStart)) : null;
-  const end = dateEnd ? new Date(Number(dateEnd)) : null;
 
-  return User.updateOne({ userId }, {
-    $push: {
-      diseases: {
-        title, dateStart: start, dateEnd: end, color,
+  const { floodControl: { time: FLOOD_TIME }} = config;
+
+  const userDiseases = await User.find({ userId,
+    updatedAt: {
+      $gt: new Date(Date.now() - FLOOD_TIME)
+  }});
+
+  if (!userDiseases.length) {
+    const start = dateStart ? new Date(Number(dateStart)) : null;
+    const end = dateEnd ? new Date(Number(dateEnd)) : null;
+
+    return User.updateOne({ userId }, {
+      $push: {
+        diseases: {
+          title, dateStart: start, dateEnd: end, color,
+        },
       },
-    },
+    });
+  }
+
+  throw new HttpError({
+    message: 'Too Many Requests',
+    code: 429,
   });
 }
 
@@ -153,11 +169,26 @@ async function deleteDisease({ diseaseId }, userId) {
 }
 
 async function addAllergen({ title, date, color }, userId) {
-  const convertedDate = date ? new Date(Number(date)) : null;
-  return User.updateOne({ userId }, {
-    $push: {
-      allergens: { title, date: convertedDate, color },
-    },
+  const { floodControl: { time: FLOOD_TIME }} = config;
+
+  const userAllergens = await User.find({ userId,
+    updatedAt: {
+      $gt: new Date(Date.now() - FLOOD_TIME)
+  }});
+
+  if (!userAllergens.length) {
+    const convertedDate = date ? new Date(Number(date)) : null;
+
+    return User.updateOne({ userId }, {
+      $push: {
+        allergens: { title, date: convertedDate, color },
+      },
+    });
+  }
+
+  throw new HttpError({
+    message: 'Too Many Requests',
+    code: 429,
   });
 }
 
