@@ -2,7 +2,14 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
+
+const { ObjectId } = mongoose.Types;
+
 const SchemaDefinition = {
+  uuidv4: {
+    type: ObjectId,
+    default: ObjectId,
+  },
   userName: {
     type: String,
     require: true,
@@ -46,12 +53,9 @@ const UserSchema = new Schema(SchemaDefinition, {
   versionKey: false,
 });
 
-// UserSchema.pre(/update|save/i, (next) => {
-//   this.updatedAt = Date.now();
-//   return next();
-// });
 
-UserSchema.index({ vk_user_id: 1 });
+UserSchema.index({ vk_user_id: 1, uuidv4: 1 }, { unique: true });
+
 
 const User = mongoose.model('user', UserSchema);
 
