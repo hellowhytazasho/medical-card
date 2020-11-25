@@ -9,11 +9,13 @@ const { createHistory } = require('./history.service');
 
 const ONE_DAY = 1;
 
-async function getUserData({ uuid, type }, userId) {
+async function getUserData({ uuid, uuidv4 }, userId) {
   const user = await User.findOne({ userId }).lean().exec();
+
 
   if (uuid && !user._id.equals(uuid)) {
     const client = await User.findOne({ _id: uuid }).lean().exec();
+
     if (!client) {
       throw new HttpError({
         message: 'Client not found',
@@ -21,11 +23,38 @@ async function getUserData({ uuid, type }, userId) {
       });
     }
 
-    if (client._id.equals(uuid) && client.allowView == type) {
+    if (client._id.equals(uuid)) {
       const clientEvents = await Event.find({ userId: client.userId }).lean().exec();
       client.events = clientEvents;
 
-      await createHistory(user, client.userId, type);
+      await createHistory(user, client.userId, 0);
+      return {
+        ...client,
+        history: [],
+      };
+    }
+
+    throw new HttpError({
+      message: 'Wrong uuid or wrong type',
+      code: 401,
+    });
+  }
+
+  if (uuidv4 && String(user.uuidv4) != uuidv4) {
+    const client = await User.findOne({ uuidv4 }).lean().exec();
+
+    if (!client) {
+      throw new HttpError({
+        message: 'Client not found',
+        code: 404,
+      });
+    }
+
+    if (String(client.uuidv4) === uuidv4) {
+      const clientEvents = await Event.find({ userId: client.userId }).lean().exec();
+      client.events = clientEvents;
+
+      await createHistory(user, client.userId, 1);
       return {
         ...client,
         history: [],
