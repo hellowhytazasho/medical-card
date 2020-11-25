@@ -15,5 +15,9 @@
   "vkApp": {
     "secretKey": "VK_APP_SECRET_KEY",
     "token": "VK_APP_TOKEN"
+  },
+  "floodControl": {
+    "time": "FLOOD_TIME",
+    "count": "ELEMENT_CONT"
   }
 }
