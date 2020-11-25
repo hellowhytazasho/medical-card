@@ -50,10 +50,8 @@ app.use((error, req, res, next) => {
   }
 
   res.send({
-    error: {
       status: error.code || 500,
       message: error.message,
-    },
   });
 });
 
