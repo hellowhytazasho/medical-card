@@ -17,8 +17,8 @@ async function addNewEvent({
 
   if (userEvents.length > ELEM_COUNT) {
     throw new HttpError({
-      message: 'Stop flooding',
-      code: 401,
+      message: 'Too Many Requests',
+      code: 429,
     });
   } else {
     await Event.create({
