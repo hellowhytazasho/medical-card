@@ -7,6 +7,7 @@ const { History } = require('../models/history.model');
 const getVKUserData = require('../helpers/get-user-info.helper');
 const { HttpError } = require('../errors');
 const { createHistory } = require('./history.service');
+const logger = require('../logger')('user-service');
 
 const ONE_DAY = 1;
 
@@ -147,6 +148,7 @@ async function addDisease({
 async function editDisease({
   diseaseId, title, dateStart, dateEnd, color,
 }, userId) {
+  logger.info(diseaseId, title, dateStart, dateEnd, color, userId);
   const start = dateStart ? new Date(Number(dateStart)) : null;
   const end = dateEnd ? new Date(Number(dateEnd)) : null;
 
