@@ -24,7 +24,7 @@ async function getUserData({ uuid, uuidv4 }, userId) {
       });
     }
 
-    if (client._id.equals(uuid)) {
+    if (client._id.equals(uuid) && client.allowView == 0) {
       const clientEvents = await Event.find({ userId: client.userId }).lean().exec();
       client.events = clientEvents;
 
@@ -51,7 +51,7 @@ async function getUserData({ uuid, uuidv4 }, userId) {
       });
     }
 
-    if (String(client.uuidv4) === uuidv4) {
+    if (String(client.uuidv4) === uuidv4 && client.allowView == 1) {
       const clientEvents = await Event.find({ userId: client.userId }).lean().exec();
       client.events = clientEvents;
 
@@ -122,7 +122,7 @@ async function addDisease({
 
   const userDiseases = await User.find({ userId,
     updatedAt: {
-      $gt: new Date(Date.now() - FLOOD_TIME)
+      $gt: new Date(Date.now() - FLOOD_TIME),
   }});
 
   if (!userDiseases.length) {
