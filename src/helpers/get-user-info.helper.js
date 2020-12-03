@@ -5,7 +5,7 @@ const { parse } = require('date-fns');
 const { HttpError } = require('../errors');
 
 const { vkApp: { token: VK_APP_TOKEN } } = config;
-const BAD_LENGTH = 4;
+const BAD_LENGTH = 5;
 
 async function getVKUserData(userId) {
   try {
