@@ -10,61 +10,42 @@ const { createHistory } = require('./history.service');
 
 const ONE_DAY = 1;
 
-async function getUserData({ uuid, uuidv4 }, userId) {
+async function getUserData({ uuid }, userId) {
   const user = await User.findOne({ userId }).lean().exec();
 
 
   if (uuid && !user._id.equals(uuid)) {
-    const client = await User.findOne({ _id: uuid }).lean().exec();
+    const uuidClient = await User.findOne({ _id: uuid }).lean().exec();
+    const uuidv4Client =  await User.findOne({ uuidv4: uuid }).lean().exec();
 
-    if (!client) {
+
+    if (!uuidClient && !uuidv4Client) {
       throw new HttpError({
         message: 'Client not found',
         code: 404,
       });
-    }
+    } else if (uuidClient && uuidClient.allowView == 0) {
 
-    if (client._id.equals(uuid) && client.allowView == 0) {
-      const clientEvents = await Event.find({ userId: client.userId }).lean().exec();
-      client.events = clientEvents;
+      const clientEvents = await Event.find({ userId: uuidClient.userId }).lean().exec();
+      uuidClient.events = clientEvents;
 
-      await createHistory(user, client.userId, 0);
+      await createHistory(user, uuidClient.userId, 0);
       return {
-        ...client,
+        ...uuidClient,
         history: [],
       };
+    } else if (uuidv4Client && uuidv4Client.allowView == 1) {
+        const clientEvents = await Event.find({ userId: uuidv4Client.userId }).lean().exec();
+        uuidv4Client.events = clientEvents;
+        await createHistory(user, uuidv4Client.userId, 1);
+        return {
+          ...uuidv4Client,
+          history: [],
+        };
     }
-
     throw new HttpError({
-      message: 'Wrong uuid or wrong type',
-      code: 401,
-    });
-  }
-
-  if (uuidv4 && String(user.uuidv4) != uuidv4) {
-    const client = await User.findOne({ uuidv4 }).lean().exec();
-
-    if (!client) {
-      throw new HttpError({
-        message: 'Client not found',
-        code: 404,
-      });
-    }
-
-    if (String(client.uuidv4) === uuidv4 && client.allowView == 1) {
-      const clientEvents = await Event.find({ userId: client.userId }).lean().exec();
-      client.events = clientEvents;
-
-      await createHistory(user, client.userId, 1);
-      return {
-        ...client,
-        history: [],
-      };
-    }
-
-    throw new HttpError({
-      message: 'Wrong uuid or wrong type',
-      code: 401,
+      message: 'Wrong uuid',
+      code: 404,
     });
   }
 
