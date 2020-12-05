@@ -46,6 +46,10 @@ const SchemaDefinition = {
   sex: {
     type: Number,
   },
+  doctor: {
+    type: Number,
+    default: 0,
+  },
 };
 
 const UserSchema = new Schema(SchemaDefinition, {
