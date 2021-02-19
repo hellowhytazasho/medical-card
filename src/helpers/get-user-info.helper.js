@@ -9,7 +9,9 @@ const BAD_LENGTH = 5;
 
 async function getVKUserData(userId) {
   try {
-    const url = `https://api.vk.com/method/users.get?lang=ru&user_ids=${userId}&fields=photo_200_orig,sex,bdate&access_token=${VK_APP_TOKEN}&v=5.122`;
+    const url = `https://api.vk.com/method/users.get?lang=ru&user_ids=${userId}
+    &fields=photo_200_orig,sex,bdate&access_token=${VK_APP_TOKEN}&v=5.122`;
+
     const resp = await axios.get(url);
     const respData = resp.data;
 
@@ -26,7 +28,6 @@ async function getVKUserData(userId) {
     } else {
       birthday = null;
     }
-
 
     const userData = {
       userName: `${respData.response[0].first_name} ${respData.response[0].last_name}`,

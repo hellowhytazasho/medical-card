@@ -12,21 +12,20 @@ const ONE_DAY = 1;
 
 async function getUserData({ uuid }, userId) {
   const user = await User.findOne({ userId }).lean().exec();
-
-
+  // eslint-disable-next-line no-underscore-dangle
   if (uuid && !user._id.equals(uuid)) {
     const uuidClient = await User.findOne({ _id: uuid }).lean().exec();
-    const uuidv4Client =  await User.findOne({ uuidv4: uuid }).lean().exec();
-
+    const uuidv4Client = await User.findOne({ uuidv4: uuid }).lean().exec();
 
     if (!uuidClient && !uuidv4Client) {
       throw new HttpError({
         message: 'Client not found',
         code: 404,
       });
-    } else if (uuidClient && uuidClient.allowView == 0) {
-
-      const clientEvents = await Event.find({ userId: uuidClient.userId }).lean().exec();
+    } else if (uuidClient && uuidClient.allowView === 0) {
+      const clientEvents = await Event.find({ userId: uuidClient.userId })
+        .lean()
+        .exec();
       uuidClient.events = clientEvents;
 
       await createHistory(user, uuidClient.userId, 0);
@@ -34,14 +33,17 @@ async function getUserData({ uuid }, userId) {
         ...uuidClient,
         history: [],
       };
-    } else if (uuidv4Client && uuidv4Client.allowView == 1) {
-        const clientEvents = await Event.find({ userId: uuidv4Client.userId }).lean().exec();
-        uuidv4Client.events = clientEvents;
-        await createHistory(user, uuidv4Client.userId, 1);
-        return {
-          ...uuidv4Client,
-          history: [],
-        };
+    } else if (uuidv4Client && uuidv4Client.allowView === 1) {
+      const clientEvents = await Event.find({ userId: uuidv4Client.userId })
+        .lean()
+        .exec();
+
+      uuidv4Client.events = clientEvents;
+      await createHistory(user, uuidv4Client.userId, 1);
+      return {
+        ...uuidv4Client,
+        history: [],
+      };
     }
     throw new HttpError({
       message: 'Wrong uuid',
@@ -98,13 +100,14 @@ async function getUserData({ uuid }, userId) {
 async function addDisease({
   title, dateStart, dateEnd, color,
 }, userId) {
+  const { floodControl: { time: FLOOD_TIME } } = config;
 
-  const { floodControl: { time: FLOOD_TIME }} = config;
-
-  const userDiseases = await User.find({ userId,
+  const userDiseases = await User.find({
+    userId,
     updatedAt: {
       $gt: new Date(Date.now() - FLOOD_TIME),
-  }});
+    },
+  });
 
   if (!userDiseases.length) {
     const start = dateStart ? new Date(Number(dateStart)) : null;
@@ -150,12 +153,14 @@ async function deleteDisease({ diseaseId }, userId) {
 }
 
 async function addAllergen({ title, date, color }, userId) {
-  const { floodControl: { time: FLOOD_TIME }} = config;
+  const { floodControl: { time: FLOOD_TIME } } = config;
 
-  const userAllergens = await User.find({ userId,
+  const userAllergens = await User.find({
+    userId,
     updatedAt: {
-      $gt: new Date(Date.now() - FLOOD_TIME)
-  }});
+      $gt: new Date(Date.now() - FLOOD_TIME),
+    },
+  });
 
   if (!userAllergens.length) {
     const convertedDate = date ? new Date(Number(date)) : null;

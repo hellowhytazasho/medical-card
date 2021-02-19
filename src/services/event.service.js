@@ -6,14 +6,15 @@ const { Event } = require('../models/event.model');
 async function addNewEvent({
   title, description, date, color,
 }, { userId }) {
+  const { floodControl: { time: FLOOD_TIME } } = config;
+  const { floodControl: { count: ELEM_COUNT } } = config;
 
-  const { floodControl: { time: FLOOD_TIME }} = config;
-  const { floodControl: { count: ELEM_COUNT }} = config;
-
-  const userEvents = await Event.find({ userId,
+  const userEvents = await Event.find({
+    userId,
     createdAt: {
-      $gt: new Date(Date.now() - FLOOD_TIME)
-  }});
+      $gt: new Date(Date.now() - FLOOD_TIME),
+    },
+  });
 
   if (userEvents.length > ELEM_COUNT) {
     throw new HttpError({
