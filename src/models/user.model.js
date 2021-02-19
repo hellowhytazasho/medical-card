@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
-
 const { ObjectId } = mongoose.Types;
 
 const SchemaDefinition = {
@@ -57,9 +56,7 @@ const UserSchema = new Schema(SchemaDefinition, {
   versionKey: false,
 });
 
-
-UserSchema.index({ vk_user_id: 1, uuidv4: 1 }, { unique: true });
-
+UserSchema.index({ uuidv4: 1 }, { unique: true });
 
 const User = mongoose.model('user', UserSchema);
 
